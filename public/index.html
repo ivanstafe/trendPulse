@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrendPulse</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: rgba(211, 211, 221, 0.76);
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+
+        #chart-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            width: auto;
+            height: 290px;
+            transition: background-color 0.5s;
+            padding: 20px;
+            background-color: #f9f9f9bb;
+            border-radius: 50px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.178);
+        }
+
+
+        canvas:hover,
+        .highlight {
+            background-color: #ffffff;
+            /* Ilumina el fondo al pasar el mouse o al presionar una flecha */
+        }
+
+        table {
+            margin-left: 20px;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            /* Agregamos un borde a las celdas */
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.178);
+
+        }
+
+        button {
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 80px;
+
+        }
+
+
+
+        .button-container button {
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+            border-radius: 100px;
+
+
+        }
+
+        .button-container button:hover {
+            background-color: #45a049;
+
+        }
+
+        /* Estilos para el botón "Predecir" */
+        .button-container button:nth-child(3) {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:nth-child(3):hover {
+            background-color: #fa9821;
+
+        }
+
+        /* Estilo específico para el botón "Reiniciar Tabla" */
+        .button-container button:last-child {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 80px;
+        }
+
+        .button-container button:last-child:hover {
+            background-color: #d32f2f;
+        }
+
+
+        #timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 81.3%;
+            background-color: #f9f9f9bb;
+            transition: background-color 0.5s;
+            padding: 5px;
+            margin-top: 20px;
+            margin-right: 196px;
+            border-radius: 50px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.178);
+
+
+
+        }
+
+        #timer-container h2 {
+            margin-right: 20px;
+            font-size: 35px;
+        }
+
+        #timer-container input {
+            width: 100px;
+            margin-right: 20px;
+            font-size: 20px;
+        }
+
+        .timer-controls button {
+            width: 80px;
+            margin-right: 10px;
+
+        }
+
+
+        #timer-container label,
+
+        #timer-container button {
+            margin: 3px;
+            border-radius: 100px;
+
+        }
+
+        #timer-container input {
+
+            width: 90px;
+        }
+
+
+        .timer-container {
+            border: 2px solid #000;
+            padding: 5px;
+            border-radius: 8px;
+            display: inline-block;
+
+        }
+
+        #timer {
+            border: 5px solid #104b6344;
+            padding: 10px;
+            border-radius: 8px;
+            color: #0025f8;
+
+            font-family: monospace;
+        }
+
+        /* Estilos para el botón de cronómetro */
+        .timer-controls button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+
+        }
+
+        .timer-controls button:hover {
+            background-color: #0b7dda;
+        }
+
+        /* Estilos específicos para el botón "Reiniciar" del cronómetro */
+        .timer-controls button:last-child {
+            background-color: #f44336;
+        }
+
+        .timer-controls button:last-child:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Efecto fondo controles */
+
+        .button-container {
+            background-color: #f9f9f9bb;
+            transition: background-color 0.5s;
+            padding: 20px;
+            border-radius: 10px;
+            width: fit-content;
+
+
+        }
+
+        .button-container:hover,
+        #timer-container:hover {
+            background-color: #ffffff;
+
+        }
+
+        .timer-controls {
+            padding: 25px;
+            border-radius: 50px;
+            display: inline-block;
+            background-color: #2195f317;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="container">
+
+        <div id="timer-container">
+            <h2
+                style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #0a79f88c; margin-left: 50px;">
+                TrendPulse </h2>
+            <div class="timer-controls">
+                <button onclick="startTimer()">Iniciar</button>
+                <button onclick="stopTimer()">Detener</button>
+                <input style="text-align: center; margin-left: 25px;" type="text" id="timer" value="00:00" readonly>
+
+                <button onclick="resetTimer()">Reiniciar</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 6px;" id="chart-container">
+
+
+            <canvas id="myChart" onmouseover="highlightChart(true)" onmouseout="highlightChart(false)"></canvas>
+            <table>
+
+                <tr>
+                    <td class="button-container">
+                        <button onclick="handleArrowClick('up')" onmousedown="highlightChart(true)"
+                            onmouseup="highlightChart(false)">
+                            ↑ Alza <span id="upCount">0</span>
+                        </button>
+                        <button onclick="handleArrowClick('down')" onmousedown="highlightChart(true)"
+                            onmouseup="highlightChart(false)">
+                            ↓ Baja <span id="downCount">0</span>
+                        </button>
+                        <button onclick="predictNextDirection()" onmousedown="highlightChart(true)"
+                            onmouseup="highlightChart(false)">Predecir</button>
+                        <select id="predictionWindowSelect" onchange="updatePredictionWindow()">
+                            <option value="10">Últimos 10 valores</option>
+                            <option value="20">Últimos 20 valores</option>
+                            <option value="30" selected>Últimos 30 valores</option>
+
+                        </select>
+
+                        <br>
+                        <button onclick="resetTable()">Reiniciar</button>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+
+
+    </div>
+    <script>
+
+
+        //predictor
+        function updatePredictionWindow() {
+    const selectedValue = document.getElementById('predictionWindowSelect').value;
+    config.predictionWindow = parseInt(selectedValue);
+    console.log(`Ventana de predicción actualizada a: ${config.predictionWindow}`);
+}
+
+window.onload = function () {
+        updatePredictionWindow();
+         
+        }
+
+        function predictNextDirection() {
+    const predictionWindow = config.predictionWindow;
+    console.log(`Cantidad de valores para predicción: ${predictionWindow}`);
+
+    if (trendData.length >= predictionWindow) {
+        const lastValues = trendData.slice(-predictionWindow);
+        const average = lastValues.reduce((acc, val) => acc + val, 0) / predictionWindow;
+
+        const recentTrendDirection = trendData[trendData.length - 1] > average ? 'up' : 'down';
+
+        let predictedDirection = '';
+        if (recentTrendDirection === 'down') {
+            predictedDirection = 'up';
+        } else {
+            predictedDirection = 'down';
+        }
+
+        alert(`Tendencia reciente: ${recentTrendDirection}\nPredicción: ${predictedDirection}`);
+    } else {
+        alert('No hay suficientes datos para predecir.');
+    }
+}
+
+//fin predictor
+
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        let trendData = [];
+        let trendDirection = '';
+        let yScaleMax = 10;  // Valor máximo inicial para la escala y
+
+        const config = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Tendencia',
+                        data: trendData,
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Media',
+                        data: [],
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        fill: false,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        suggestedMin: -yScaleMax,
+                        suggestedMax: yScaleMax
+                    }
+                }
+            },
+            predictionWindow: 10 // Valor por defecto para la ventana de predicción
+        };
+
+        const myChart = new Chart(ctx, config);
+
+        function handleArrowClick(direction) {
+            trendDirection = direction;
+            updateChart();
+        }
+
+
+        function updateChart() {
+            if (trendDirection === 'up') {
+                const lastValue = trendData.length > 0 ? trendData[trendData.length - 1] : 0;
+                trendData.push(lastValue + 1);
+            } else if (trendDirection === 'down') {
+                const lastValue = trendData.length > 0 ? trendData[trendData.length - 1] : 0;
+                trendData.push(lastValue - 1);
+            }
+
+            const media = trendData.reduce((acc, val) => acc + val, 0) / trendData.length;
+            config.data.labels = trendData.map((_, index) => index + 1);
+            config.data.datasets[1].data = Array(trendData.length).fill(media);
+
+            if (Math.max(...trendData) > yScaleMax || Math.abs(Math.min(...trendData)) > yScaleMax) {
+                yScaleMax = Math.max(...trendData) + 10;
+                config.options.scales.y.suggestedMax = yScaleMax;
+                config.options.scales.y.suggestedMin = -yScaleMax;
+            }
+
+            myChart.update();
+        }
+
+        function highlightChart(highlight) {
+            const chartCanvas = document.getElementById('myChart');
+            if (highlight) {
+                chartCanvas.classList.add('highlight');
+            } else {
+                chartCanvas.classList.remove('highlight');
+            }
+        }
+
+
+        function resetTable() {
+            location.reload();
+        }
+
+
+
+        //cronometro
+
+        let timerInterval;
+        let timerMinutes = 0;
+        let timerSeconds = 0;
+
+        function startTimer() {
+            clearInterval(timerInterval);
+
+            timerInterval = setInterval(function () {
+                timerSeconds++;
+
+                if (timerSeconds === 60) {
+                    timerMinutes++;
+                    timerSeconds = 0;
+                }
+
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerMinutes = 0;
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const formattedMinutes = timerMinutes < 10 ? `0${timerMinutes}` : timerMinutes;
+            const formattedSeconds = timerSeconds < 10 ? `0${timerSeconds}` : timerSeconds;
+
+            document.getElementById('timer').value = `${formattedMinutes}:${formattedSeconds}`;
+        }
+
+
+        //contador clicks
+
+        let upCounter = 0;
+        let downCounter = 0;
+
+        function handleArrowClick(direction) {
+            trendDirection = direction;
+            updateChart();
+
+            // Actualiza los contadores al presionar las flechas
+            if (direction === 'up') {
+                upCounter++;
+                document.getElementById('upCount').innerText = upCounter;
+            } else if (direction === 'down') {
+                downCounter++;
+                document.getElementById('downCount').innerText = downCounter;
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
